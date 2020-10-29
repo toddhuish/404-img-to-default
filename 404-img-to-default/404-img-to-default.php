@@ -75,6 +75,15 @@ class Default_404_Img {
 				case 'placeholder':
 					$uri = 'https://via.placeholder.com/'.$x.'x'.$y;
 					break;
+				case 'picsum':
+					$uri = 'https://picsum.photos/'.$x.'/'.$y;
+					break;
+				case 'placekitten':
+					$uri = 'https://placekitten.com/'.$x.'/'.$y;
+					break;
+				case 'baconmockup':
+					$uri = 'https://baconmockup.com/'.$x.'/'.$y;
+					break;
 				default:
 					$uri = 'https://www.fillmurray.com/'.$x.'/'.$y;
 			}
@@ -105,6 +114,9 @@ class Default_404_Img {
 		$providers = array(
 			'fillmurray' => 'Fill Murray',
 			'placeholder' => 'Placeholder.com',
+			'picsum' => 'Lorem Picsum',
+			'placekitten' => 'Place Kitten',
+			'baconmockup' => 'Bacon Mockup',
 		);
 		?>
 		<div id="wrap">
