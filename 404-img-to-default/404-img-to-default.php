@@ -65,9 +65,7 @@ class Default_404_Img {
 	
 	public static function get_img_url( $uri, $x, $y ) {
 		$option = get_option('default_404_img');
-		if(isset($option['site']) && wp_http_validate_url($option['site'])){
-			$uri = $option['site'].'/'.$uri;
-		} elseif( isset($option['provider']) && strlen($option['provider'])) {
+		if( isset($option['provider']) && strlen($option['provider'])) {
 			switch($option['provider']){
 				case 'fillmurray':
 					$uri = 'https://www.fillmurray.com/'.$x.'/'.$y;
@@ -83,6 +81,9 @@ class Default_404_Img {
 					break;
 				case 'baconmockup':
 					$uri = 'https://baconmockup.com/'.$x.'/'.$y;
+					break;
+				case 'other':
+					$uri = $option['site'].'/'.$uri;
 					break;
 				default:
 					$uri = 'https://www.fillmurray.com/'.$x.'/'.$y;
@@ -105,9 +106,12 @@ class Default_404_Img {
 			$option = array( 'site' => '', 'provider' => '' ); 
 			if(isset($_POST['imgsite']) && wp_http_validate_url($_POST['imgsite'])){
 				$option['site'] = $_POST['imgsite'];
-			} else {
+			}
+			
+			if(isset($_POST['imgprovider']) && strlen($_POST['imgprovider'])){
 				$option['provider'] = $_POST['imgprovider'];
 			}
+
 			update_option('default_404_img', $option);
 		}
 
@@ -117,6 +121,7 @@ class Default_404_Img {
 			'picsum' => 'Lorem Picsum',
 			'placekitten' => 'Place Kitten',
 			'baconmockup' => 'Bacon Mockup',
+			'other' => 'Origin Site',
 		);
 		?>
 		<div id="wrap">
@@ -127,11 +132,27 @@ class Default_404_Img {
 			<?php foreach( $providers as $k => $v ) { 
 				echo '<input type="radio" name="imgprovider" id="'.$k.'" value="'.$k.'" '.(isset($option['provider']) && $option['provider'] == $k ? 'checked':'').' /><label for="'.$k.'">'.$v.'</label><br>';
 			} ?>
-			<h3>A specific WP site URL</h3>
-			<input type="text" name="imgsite" class="widefat" style="width:50%" value="<?php echo $option['site']; ?>" placeholder="URL of remote WP site" /><br>
+			<div id="otherdiv" style="display:none;">
+				<h3>A specific WP site URL</h3>
+				<input type="text" name="imgsite" class="widefat" style="width:50%" value="<?php echo $option['site']; ?>" placeholder="URL of remote WP site" /><br>
+			</div>
 			<input class="submit-primary" type="submit" name="submit" value="Save Settings" />
 		</form>
 		</div>
+		<script type="text/javascript">
+		jQuery(document).ready(function($) {
+			if($('#other').is(':checked') ){
+				$('#otherdiv').show();
+			}
+			$('input:radio[name="imgprovider"]').change(function(){
+				if($('#other').is(':checked') ){
+					$('#otherdiv').show();
+				} else {
+					$('#otherdiv').hide();
+				}
+			});
+		});
+		</script>
 		<?php
 	}
 }
