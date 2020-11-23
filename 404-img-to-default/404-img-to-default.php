@@ -33,7 +33,7 @@ class Default_404_Img {
 			preg_match( '/(wp-content.*?$)/', $uri, $wp_content_url );
 			$uri = $wp_content_url[1];
 
-			$ext = substr( $uri, -3 );
+			$ext   = substr( $uri, -3 );
 			$types = array( 'jpg', 'gif', 'png', 'ebp' );
 			preg_match( '/(\d+x\d+)\..*?$/', $uri, $size );
 			$x = $y = 0;
@@ -46,7 +46,7 @@ class Default_404_Img {
 				$x = $y = 500;
 			}
 
-			if ( in_array( $ext, $types ) ) {
+			if ( in_array( $ext, $types, true ) ) {
 				status_header( 200 );
 				self::img_header( $ext );
 				$stream = fopen( 'php://output', 'w' );
@@ -66,7 +66,7 @@ class Default_404_Img {
 	 * @return void
 	 */
 	public static function img_header( $ext ) {
-		switch( $ext ) {
+		switch ( $ext ) {
 			case 'jpg':
 				header( 'Content-type: image/jpeg' );
 				break;
@@ -86,14 +86,14 @@ class Default_404_Img {
 	 * Get the image.
 	 *
 	 * @param [type] $uri
-	 * @param [type] $x
-	 * @param [type] $y
+	 * @param [type] $x X coordinate.
+	 * @param [type] $y Y coordinate.
 	 * @return void
 	 */
 	public static function get_img_url( $uri, $x, $y ) {
 		$option = get_option( 'default_404_img' );
 		if ( isset( $option['provider'] ) && strlen( $option['provider'] ) ) {
-			switch( $option['provider'] ) {
+			switch ( $option['provider'] ) {
 				case 'fillmurray':
 					$uri = 'https://www.fillmurray.com/' . $x . '/' . $y;
 					break;
@@ -124,7 +124,7 @@ class Default_404_Img {
 	 *
 	 * @return void
 	 */
-	public static function menu(){
+	public static function menu() {
 		add_management_page( 'Default 404 Img', 'Default 404 Img', 'install_plugins', 'default404img', array( 'Default_404_Img', 'ui' ) );
 	}
 	/**
@@ -141,12 +141,12 @@ class Default_404_Img {
 			);
 		}
 
-		if ( isset( $_POST['default-404-img-nonce'] ) && wp_verify_nonce( $_POST['default-404-img-nonce'], plugin_basename(__FILE__) ) ) {
+		if ( isset( $_POST['default-404-img-nonce'] ) && wp_verify_nonce( $_POST['default-404-img-nonce'], plugin_basename( __FILE__ ) ) ) {
 			$option = array( 'site' => '', 'provider' => '' ); 
 			if ( isset( $_POST['imgsite'] ) && wp_http_validate_url( $_POST['imgsite'] ) ) {
 				$option['site'] = $_POST['imgsite'];
 			}
-			
+
 			if ( isset( $_POST['imgprovider'] ) && strlen( $_POST['imgprovider'] ) ) {
 				$option['provider'] = $_POST['imgprovider'];
 			}
