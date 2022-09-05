@@ -5,7 +5,7 @@ Plugin URI: https://9seeds.com
 Description: a plugin to insert placeholder images for any img request that throw a 404
 Author: Todd Huish
 Version: 1.0
-Author URI: http://9seeds.com
+Author URI: http://greenpixeldev.com
 **/
 
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -27,7 +27,7 @@ class Default_404_Img {
 
 			$ext = substr($uri,-3);
 			//peg and ebp are jpeg and webp but I only look at last 3 chars.
-			$types = array('peg','jpg','gif','png','ebp');
+			$types = array('peg','jpg','gif','png','ebp','svg');
 			preg_match("/(\d+x\d+)\..*?$/",$uri,$size);
 			$x = $y = 0;
 			if(isset($size[1])){
@@ -77,6 +77,9 @@ class Default_404_Img {
 				break;
 			case 'ebp':
 				header('Content-type: image/webp');
+				break;
+			case 'svg':
+				header('Content-type: image/svg+xml');
 				break;
 		}
 	}
