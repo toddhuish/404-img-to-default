@@ -1,27 +1,33 @@
 <?php
-/*
+/**
 Plugin Name: Insert placeholder for 404 images
 Plugin URI: https://9seeds.com
 Description: a plugin to insert placeholder images for any img request that throw a 404
 Author: Todd Huish
 Version: 1.0
 Author URI: http://9seeds.com
-*/
+**/
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 add_action( 'wp', array( 'Default_404_Img', 'default_img') );
 add_action( 'admin_menu', array( 'Default_404_Img', 'menu' ) );
+
+register_activation_hook( __FILE__, array( 'Default_404_Img', 'activate' ) );
+
 class Default_404_Img {
 	public static function default_img() {
 		if(is_404()) 
 		{
+			$wud = wp_upload_dir();
+
 			$uri = $_SERVER['REQUEST_URI'];
 			preg_match('/(wp-content.*?$)/',$uri,$wp_content_url);
 			$uri = $wp_content_url[1];
 
 			$ext = substr($uri,-3);
-			$types = array('jpg','gif','png','ebp');
+			//peg and ebp are jpeg and webp but I only look at last 3 chars.
+			$types = array('peg','jpg','gif','png','ebp');
 			preg_match("/(\d+x\d+)\..*?$/",$uri,$size);
 			$x = $y = 0;
 			if(isset($size[1])){
@@ -39,8 +45,20 @@ class Default_404_Img {
 				$stream = fopen('php://output', 'w');
 
 				$imgurl = self::get_img_url( $uri, $x, $y );
+				$remote = wp_parse_url( $imgurl );
+				$dest = $wud['basedir'].str_replace( 'wp-content/uploads/', '', $remote['path']);
+				$img = file_get_contents( $imgurl );
+				file_put_contents('php://output', $img );
+				
+				//make sure dir is created
+				$dirname = dirname($dest);
+				if( !is_dir($dirname) ){
+					$old = umask(0);
+					mkdir( $dirname, 0755, true);
+					umask($old);
+				}
 
-				file_put_contents('php://output', file_get_contents( $imgurl ) );
+				file_put_contents( $dest, $img );
 				die();
 			}
 		}
@@ -154,5 +172,13 @@ class Default_404_Img {
 		});
 		</script>
 		<?php
+	}
+
+	public static function activate() {
+		$option = get_option('default_404_img');
+		if( !$option ) {
+			$option = array( 'site' => '', 'provider' => 'fillmurray' ); 
+			update_option('default_404_img', $option);
+		}
 	}
 }
